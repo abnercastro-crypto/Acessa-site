@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ACESSA — Tecnologia que elimina barreiras</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{background:#F8FAFC;color:#0F172A;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+:focus-visible{outline:3px solid #2563EB;outline-offset:2px}
+.fs1{font-size:115%}.fs2{font-size:130%}.fs3{font-size:145%}
+.dys #app *,.dys #panel *{letter-spacing:.12em!important;word-spacing:.3em!important;line-height:2!important}
+.pause *{animation:none!important;transition:none!important}
+.hc #app,.hc #app *{background:#000!important;color:#fff!important;border-color:#ff0!important;box-shadow:none!important}
+.hc #app h1,.hc #app h2,.hc #app h3,.hc #app a,.hc #app summary,.hc #app .hl{color:#ff0!important}
+.hc #panel{background:#000!important;color:#fff!important;border:2px solid #ff0}.hc #panel *{border-color:#ff0!important}
+.lf #app a,.lf #app button,.lf #app input,.lf #app summary{outline:4px solid #f59e0b!important;outline-offset:2px;border-width:3px!important}
+#guide{position:fixed;left:0;right:0;height:42px;background:rgba(250,204,21,.28);border-top:2px solid #ca8a04;border-bottom:2px solid #ca8a04;pointer-events:none;z-index:60;display:none}
+.bar{transition:width .4s}
+</style>
+</head>
+<body>
+<div id="guide" aria-hidden="true"></div>
+<div id="app">
+<a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:p-3 focus:bg-white">Pular para o conteúdo</a>
+<header class="sticky top-0 z-40 bg-white border-b border-slate-200">
+ <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center gap-3 justify-between">
+  <button onclick="go('inicio')" class="font-extrabold text-xl text-blue-800">ACESSA</button>
+  <nav aria-label="Principal" id="nav" class="flex flex-wrap gap-1 text-sm"></nav>
+ </div>
+</header>
+<main id="main" class="max-w-6xl mx-auto px-4 py-8"></main>
+<footer class="border-t border-slate-200 bg-white py-6 text-center text-sm text-slate-600">© 2026 ACESSA · inclusiveweb.co · Valores de projeção são estimativas para validação com investidores.</footer>
+</div>
+
+<button id="fab" aria-haspopup="dialog" aria-controls="panel" class="fixed bottom-4 right-4 z-50 bg-blue-800 text-white font-semibold rounded-full px-5 py-3 shadow-lg" style="bottom:calc(1rem + env(safe-area-inset-bottom,0px))">♿ Acessibilidade ACESSA</button>
+<aside id="panel" role="dialog" aria-label="Painel de acessibilidade" class="hidden fixed top-0 right-0 bottom-0 w-80 max-w-full bg-white border-l border-slate-300 z-50 overflow-y-auto p-4 text-sm shadow-2xl" style="padding-top:calc(1rem + env(safe-area-inset-top,0px))">
+ <div class="flex justify-between items-center mb-3"><h2 class="font-bold text-lg">Acessibilidade ACESSA</h2><button id="close" class="border border-slate-300 rounded px-2 py-1" aria-label="Fechar painel">✕</button></div>
+ <h3 class="font-semibold mt-3">Visão e baixa visão</h3>
+ <div class="flex gap-1 my-2" role="group" aria-label="Tamanho da fonte" id="fsb"></div>
+ <div class="grid gap-2" id="tg"></div>
+ <h3 class="font-semibold mt-4">Auditiva e cognitiva</h3>
+ <div class="grid gap-2 mt-2">
+  <button class="border border-blue-800 text-blue-800 rounded p-2 font-medium" id="tts">🔊 Ouvir esta página</button>
+  <div id="tgl"></div>
+ </div>
+ <button id="reset" class="mt-5 w-full bg-slate-900 text-white rounded p-3 font-semibold">Restaurar padrão</button>
+</aside>
+<div id="libras" class="hidden fixed left-4 bottom-4 z-50 bg-blue-800 text-white rounded-xl p-3 text-xs w-36 text-center" role="status" aria-live="polite" style="bottom:calc(1rem + env(safe-area-inset-bottom,0px))"><div class="text-3xl" aria-hidden="true">🤟</div><div class="font-semibold">Intérprete Libras</div><div class="text-emerald-300">● tradução ativa (simulação)</div></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const brl=n=>n.toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0});
+const card=(h,c='')=>`<div class="bg-white border border-slate-200 rounded-xl p-5 ${c}">${h}</div>`;
+const H2=t=>`<h2 class="text-2xl font-bold text-slate-900 mt-12 mb-4">${t}</h2>`;
+const P=t=>`<p class="text-slate-700 leading-relaxed">${t}</p>`;
+const btn='bg-blue-700 hover:bg-blue-800 text-white font-semibold rounded-lg px-5 py-3';
+const PAGES=[['inicio','Início'],['investidores','Para Investidores'],['operacao','Operação & Time'],['ecossistema','Ecossistema'],['lab','Demonstração Técnica']];
+let cur='inicio';
+
+const sol=[
+['🔎','ACESSA SCAN','Motor de varredura por IA que percorre páginas, formulários e fluxos de compra, compara cada elemento com critérios WCAG 2.2 e entrega um diagnóstico automatizado com nota, falhas priorizadas por gravidade e plano de correção com trechos de código.'],
+['🎛️','ACESSA ADAPT','Widget instalado com uma linha de código que permite ao usuário final personalizar a interface em tempo real: fonte, contraste, espaçamento para dislexia, pausa de animações, leitura em voz alta e guia de leitura.'],
+['🤝','ACESSA HUMAN (diferencial)','Plataforma que conecta empresas a testadores com deficiência remunerados — pessoas cegas, com baixa visão, surdas, neurodivergentes e com mobilidade reduzida. Eles executam tarefas reais, gravam a experiência e validam o que robôs não detectam, como ordem de leitura confusa ou fluxos impossíveis com teclado.'],
+['📈','ACESSA EVOLVE','Governança contínua: monitoramento mensal, relatórios de evolução para diretoria e auditoria, alertas de regressão a cada deploy e selo de conformidade que a empresa exibe aos clientes.']];
+
+const aloc=[['Desenvolvimento da plataforma',60000,'#1E40AF','Arquitetura cloud, front-end acessível e painel SaaS.'],['Inteligência Artificial e Servidores',30000,'#2563EB','Treinamento de modelos, APIs e infraestrutura escalável.'],['Marketing e Aquisição (CAC)',30000,'#059669','Tráfego B2B, branding e prospecção comercial.'],['Testes de Acessibilidade',22500,'#d97706','Remuneração inicial da rede de avaliadores PcD e validação técnica.'],['Custos Administrativos',7500,'#64748b','Formalização jurídica, contabilidade e ferramentas de gestão.']];
+
+function donut(){let o=0;return `<svg viewBox="0 0 42 42" class="w-56 h-56 mx-auto" role="img" aria-label="Gráfico de alocação dos R$ 150.000">${aloc.map(a=>{const p=a[1]/1500;const s=`<circle cx="21" cy="21" r="15.915" fill="none" stroke="${a[2]}" stroke-width="7" stroke-dasharray="${p} ${100-p}" stroke-dashoffset="${25-o}"/>`;o+=p;return s}).join('')}<text x="21" y="22" text-anchor="middle" font-size="4" font-weight="700" fill="currentColor">R$ 150 mil</text></svg>`}
+
+const pillars=[['Tecnologia (IA)','Varredura automática contínua','Auditoria manual pontual','Só overlay automático'],['Inclusão real (PcDs remunerados)','Rede de avaliadores com deficiência','Consultores esporádicos','Nenhuma validação humana'],['Preço acessível','A partir de R$ 59/mês','Projetos de dezenas de milhares','Mensalidade média, sem laudo'],['Inovação contínua','Modelos reciclados com feedback humano','Metodologia estática','Regras fixas'],['Escalabilidade digital','SaaS 100% remoto','Limitada por horas de consultor','Escalável, porém superficial']];
+
+const views={
+inicio:()=>`
+<section class="rounded-2xl bg-gradient-to-br from-blue-800 to-blue-600 text-white p-8 md:p-14">
+ <h1 class="text-3xl md:text-5xl font-extrabold leading-tight">ACESSA — Tecnologia que elimina barreiras</h1>
+ <p class="mt-4 text-lg max-w-3xl">Unimos inteligência artificial e validação humana por pessoas com deficiência para tornar sites e aplicativos realmente utilizáveis por todos — e transformar conformidade em vantagem competitiva para empresas de qualquer porte.</p>
+ <div class="mt-6 flex flex-wrap gap-3"><button onclick="go('investidores')" class="bg-white text-blue-800 font-semibold rounded-lg px-5 py-3">Explorar Tese de Investimento</button><a href="#sim" class="border-2 border-white font-semibold rounded-lg px-5 py-3">Testar Simulador</a></div>
+</section>
+${H2('O problema versus a solução')}
+<div class="grid md:grid-cols-2 gap-4">
+${card('<h3 class="font-bold text-lg text-red-700">O problema</h3>'+P('Mais de 18 milhões de brasileiros têm alguma deficiência e, no mundo, são cerca de 1,3 bilhão de pessoas. Ainda assim, a imensa maioria dos sites falha em critérios básicos: imagens sem texto alternativo, contraste insuficiente, formulários sem rótulos e menus inacessíveis por teclado. O resultado é exclusão digital, perda de clientes e risco jurídico crescente, especialmente com a Lei Brasileira de Inclusão e o European Accessibility Act.')+P('As ferramentas atuais dependem apenas de robôs, que detectam cerca de um terço dos problemas reais, e de overlays que mascaram falhas sem corrigi-las. Auditorias manuais são caras e inviáveis para PMEs.'))}
+${card('<h3 class="font-bold text-lg text-emerald-700">A solução ACESSA</h3>'+P('Um ciclo completo: o SCAN encontra as falhas, o ADAPT dá autonomia ao usuário, o HUMAN valida com pessoas reais com deficiência e o EVOLVE garante que a conformidade se mantenha a cada atualização do site.')+P('Esse modelo híbrido entrega precisão de auditoria humana com o custo e a velocidade de um SaaS, a partir de R$ 59 por mês, democratizando o acesso para pequenas e médias empresas.'))}
+</div>
+${H2('As 4 soluções em profundidade')}
+<div class="grid md:grid-cols-2 gap-4">${sol.map(s=>card(`<details><summary class="cursor-pointer font-bold text-lg">${s[0]} ${s[1]}</summary><p class="mt-3 text-slate-700 leading-relaxed">${s[2]}</p></details>`)).join('')}</div>
+${H2('Simulador ACESSA SCAN (demonstração)')}
+<div id="sim">${card(`<label for="url" class="font-semibold">Endereço do site a analisar</label>
+<div class="flex flex-wrap gap-2 mt-2"><input id="url" type="text" placeholder="exemplo.com.br" class="flex-1 min-w-[200px] border border-slate-300 rounded-lg px-3 py-3"><button id="run" class="${btn}">Analisar</button></div>
+<div id="res" class="mt-5" aria-live="polite"></div><p class="text-xs text-slate-500 mt-3">Resultado ilustrativo: nenhuma página é acessada nesta demonstração.</p>`)}</div>`,
+
+investidores:()=>`
+<h1 class="text-3xl font-extrabold">Tese de Investimento & Financeiro</h1>
+${P('Memorando para investidores: como cada real do aporte inicial é aplicado, como a receita é formada e por que a ACESSA é difícil de copiar.')}
+${H2('Alocação do investimento inicial: R$ 150.000')}
+<div class="grid md:grid-cols-5 gap-4 items-center">
+ <div class="md:col-span-2">${card(donut())}</div>
+ <div class="md:col-span-3 overflow-x-auto">${card(`<table class="w-full text-sm"><thead><tr class="text-left border-b border-slate-200"><th class="py-2">Item</th><th>Valor</th><th>%</th></tr></thead><tbody>${aloc.map(a=>`<tr class="border-b border-slate-100 align-top"><td class="py-3"><span class="inline-block w-3 h-3 rounded-sm mr-2" style="background:${a[2]}"></span><strong>${a[0]}</strong><br><span class="text-slate-600">${a[3]}</span></td><td class="font-semibold whitespace-nowrap">${brl(a[1])}</td><td>${a[1]/1500}%</td></tr>`).join('')}</tbody></table>`)}</div>
+</div>
+${card('<strong>Nota de governança:</strong> os valores são estimativas estruturadas, sujeitas a validação com orçamentos finais. Há ainda previsão de OPEX mensal contemplando salários, hospedagem, manutenção, impostos e divulgação, a ser coberta progressivamente pela receita recorrente.','mt-4 border-l-4 border-l-blue-700')}
+${H2('Modelo de negócio')}
+<div class="grid md:grid-cols-3 gap-4">
+${[['Starter','R$ 59/mês','Pequenos negócios: scan mensal, widget ADAPT e relatório básico.'],['Professional','R$ 199/mês','Mais escolhido: scans semanais, relatórios WCAG e testes HUMAN pontuais.'],['Enterprise','Sob consulta · base R$ 999/mês','Monitoramento contínuo, selo, SLA e testes recorrentes com PcDs.']].map(p=>card(`<h3 class="font-bold text-lg">${p[0]}</h3><p class="text-2xl font-extrabold text-blue-800 my-2">${p[1]}</p>${P(p[2])}`)).join('')}
+</div>
+${card('<strong>Receitas adicionais:</strong> consultorias, testes com usuários reais, licenciamento B2B (white label) e projetos personalizados.','mt-4')}
+${H2('Calculadora de receita')}
+${card(`<p class="text-sm text-slate-600 mb-4">Cenário base do pitch: 100 Starter + 100 Professional + 10 Enterprise = ${brl(35790)}/mês de MRR bruto. Arraste os controles para simular.</p>
+${[['s','Clientes Starter',100,500,59],['p','Clientes Professional',100,500,199],['e','Clientes Enterprise',10,100,999]].map(x=>`<div class="mb-4"><label for="${x[0]}" class="font-medium">${x[1]}: <span id="${x[0]}v" class="font-bold">${x[2]}</span></label><input id="${x[0]}" type="range" min="0" max="${x[3]}" value="${x[2]}" class="w-full accent-blue-700"></div>`).join('')}
+<div class="grid sm:grid-cols-2 gap-3 mt-2"><div class="rounded-lg bg-emerald-50 border border-emerald-200 p-4"><div class="text-sm">MRR bruto mensal</div><div id="mrr" class="text-3xl font-extrabold text-emerald-700"></div></div><div class="rounded-lg bg-emerald-50 border border-emerald-200 p-4"><div class="text-sm">Receita anual (ARR)</div><div id="arr" class="text-3xl font-extrabold text-emerald-700"></div></div></div>
+<p id="mix" class="text-sm text-slate-600 mt-3"></p>`)}
+${H2('Vantagem competitiva: os 5 pilares')}
+<div class="overflow-x-auto">${card(`<table class="w-full text-sm min-w-[600px]"><thead><tr class="text-left border-b border-slate-200"><th class="py-2">Pilar</th><th class="text-emerald-700">ACESSA</th><th>Consultorias tradicionais</th><th>Overlays automáticos</th></tr></thead><tbody>${pillars.map(r=>`<tr class="border-b border-slate-100 align-top"><td class="py-3 font-semibold">${r[0]}</td><td class="text-emerald-700 font-medium">✔ ${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('')}</tbody></table>`)}</div>`,
+
+operacao:()=>`
+<h1 class="text-3xl font-extrabold">Operação, Equipe & Cultura</h1>
+${H2('Estrutura operacional enxuta (remota/híbrida)')}
+${card(P('A operação 100% digital elimina aluguel de sede na fase inicial, usa coworkings apenas para reuniões estratégicas e apoia-se em ferramentas cloud com cobrança por uso. Com custos fixos baixos, o investimento rende mais meses de runway e a maior parte do capital vai para produto e aquisição de clientes.'))}
+${H2('As 6 áreas-chave')}
+<div class="grid md:grid-cols-3 gap-4">${[['💻','Desenvolvedor de Software','Constrói o painel SaaS, as APIs e o widget ADAPT com código acessível por padrão.'],['🧠','Especialista em IA','Treina e calibra os modelos do SCAN, usando o feedback dos testadores humanos para reduzir falsos positivos.'],['🎨','Designer UX/UI','Cria interfaces inclusivas e valida protótipos com a rede de avaliadores.'],['♿','Especialista em Acessibilidade','Garante aderência à WCAG 2.2, revisa laudos e treina os avaliadores PcD.'],['📣','Marketing & Vendas','Conduz prospecção B2B, parcerias comerciais e geração de demanda qualificada.'],['📊','Administrativo/Financeiro','Contabilidade, jurídico e gestão financeira, terceirizados de forma inteligente na fase inicial.']].map(a=>card(`<div class="text-3xl" aria-hidden="true">${a[0]}</div><h3 class="font-bold mt-2">${a[1]}</h3>${P(a[2])}`)).join('')}</div>
+${H2('Impacto social na prática')}
+${card(P('A ACESSA contrata <strong>pessoas com deficiência como avaliadoras remuneradas</strong>: gera renda, valoriza a experiência de uso real e entrega às empresas um diagnóstico que nenhum robô produz. O recrutamento segue um funil inclusivo em cinco etapas.'),'mb-4')}
+<ol class="grid md:grid-cols-5 gap-3">${['Divulgação acessível','Análise de currículos','Entrevistas adaptadas','Avaliação técnica','Seleção e contratação'].map((s,i)=>`<li class="bg-white border border-slate-200 rounded-xl p-4"><div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold">${i+1}</div><p class="mt-2 font-semibold">${s}</p></li>`).join('')}</ol>`,
+
+ecossistema:()=>`
+<h1 class="text-3xl font-extrabold">Ecossistema, Parcerias & Visão</h1>
+${H2('Crescimento via parcerias estratégicas')}
+<div class="grid md:grid-cols-2 gap-4">${[['Empresas de tecnologia','Integração com plataformas de e-commerce, CMS e agências, ampliando distribuição e inovação conjunta.'],['Instituições financeiras','Programas de impacto social e ESG que financiam a adequação de clientes e PMEs.'],['Universidades','Pesquisa em tecnologia e design, formação de talentos e estágios em acessibilidade.'],['ONGs e associações de PcDs','Recrutamento ético de avaliadores e validação comunitária das soluções.'],['Responsabilidade Social Corporativa','Patrocínios, além de captação via editais de inovação e fomento público.']].map((p,i)=>card(`<div class="text-emerald-600 font-extrabold text-2xl">0${i+1}</div><h3 class="font-bold">${p[0]}</h3>${P(p[1])}`)).join('')}</div>
+${H2('Manifesto & visão de futuro')}
+<div class="rounded-2xl bg-blue-800 text-white p-8"><p class="text-2xl font-bold">“A internet deve ser para todos.”</p><p class="mt-3 leading-relaxed">Acreditamos que acessibilidade não é um recurso extra, mas a base de uma web justa. Nossa visão é um futuro em que toda empresa, de qualquer porte, publique experiências digitais utilizáveis por todas as pessoas, e em que quem tem deficiência seja protagonista na construção dessa tecnologia.</p></div>`,
+
+lab:()=>`
+<h1 class="text-3xl font-extrabold">Laboratório de Acessibilidade</h1>
+${P('Escolha um perfil e veja o site inteiro se adaptar em tempo real. Você também pode ajustar tudo manualmente no painel flutuante.')}
+<div class="grid sm:grid-cols-2 md:grid-cols-3 gap-3 mt-5">${[['low','👁️ Baixa visão','Fonte +30% e alto contraste'],['dys','📖 Dislexia','Espaçamento amplo e foco reforçado'],['adhd','🎯 TDAH','Guia de leitura e animações pausadas'],['blind','🔊 Cegueira','Leitura em voz alta da página'],['deaf','🤟 Surdez','Intérprete Libras ativo'],['off','↺ Restaurar','Volta ao padrão']].map(p=>`<button data-p="${p[0]}" class="preset text-left bg-white border border-slate-300 rounded-xl p-4 hover:border-blue-700"><strong>${p[1]}</strong><br><span class="text-sm text-slate-600">${p[2]}</span></button>`).join('')}</div>
+${H2('Texto de exemplo')}
+${card(P('Uma pessoa com baixa visão precisa de contraste forte e fontes grandes. Quem tem dislexia lê melhor com espaçamento amplo entre letras e linhas. Para quem tem TDAH, uma régua de leitura e a ausência de movimentos reduzem a distração. Pessoas cegas dependem de leitores de tela, e pessoas surdas, de conteúdo em Libras e legendas.')+`<a href="#" onclick="return false" class="inline-block mt-3 text-blue-700 underline">Link de exemplo com foco reforçado</a>`)}`
+};
+
+/* navegação */
+function go(p){cur=p;$('#main').innerHTML=views[p]();$('#nav').innerHTML=PAGES.map(x=>`<button onclick="go('${x[0]}')" ${x[0]==p?'aria-current="page"':''} class="px-3 py-2 rounded-lg ${x[0]==p?'bg-blue-800 text-white font-semibold':'text-slate-700 hover:bg-slate-100'}">${x[1]}</button>`).join('');window.scrollTo(0,0);speechSynthesis.cancel();bind()}
+function bind(){
+ if(cur=='investidores'){const u=()=>{const s=+$('#s').value,p=+$('#p').value,e=+$('#e').value;['s','p','e'].forEach(k=>$('#'+k+'v').textContent=$('#'+k).value);const m=s*59+p*199+e*999;$('#mrr').textContent=brl(m);$('#arr').textContent=brl(m*12);$('#mix').textContent=`Starter ${brl(s*59)} · Professional ${brl(p*199)} · Enterprise ${brl(e*999)} (sem receitas adicionais).`};['s','p','e'].forEach(k=>$('#'+k).oninput=u);u()}
+ if(cur=='inicio'){$('#run').onclick=scan;$('#url').onkeydown=e=>{if(e.key=='Enter')scan()}}
+ if(cur=='lab')document.querySelectorAll('.preset').forEach(b=>b.onclick=()=>preset(b.dataset.p))}
+function scan(){let u=$('#url').value.trim();if(!u){$('#res').innerHTML='<p class="text-red-700">Digite uma URL para analisar.</p>';return}
+ $('#res').innerHTML='<p>Analisando '+u.replace(/</g,'&lt;')+'…</p>';
+ setTimeout(()=>{let h=0;for(const c of u)h=(h*31+c.charCodeAt(0))>>>0;const sc=38+h%45;
+ const iss=[['Crítica','Imagens sem texto alternativo','Adicione alt descritivo (WCAG 1.1.1)'],['Crítica','Formulários sem rótulos associados','Use label for e aria-describedby (3.3.2)'],['Alta','Contraste abaixo de 4,5:1 em botões','Ajuste as cores da marca (1.4.3)'],['Alta','Menu sem navegação por teclado','Garanta foco visível e ordem lógica (2.1.1, 2.4.7)'],['Média','Sem link de pular conteúdo','Inclua “Pular para o conteúdo” (2.4.1)'],['Média','Vídeos sem legendas','Adicione legendas e Libras (1.2.2)']];
+ const pick=[0,1,2,3,4,5].sort((a,b)=>((h>>a)&7)-((h>>b)&7)).slice(0,4).map(i=>iss[i]);
+ $('#res').innerHTML=`<div class="flex items-center gap-4"><div class="text-5xl font-extrabold ${sc<60?'text-red-600':'text-emerald-600'}">${sc}</div><div><strong>Nota de acessibilidade (0–100)</strong><br><span class="text-sm text-slate-600">Nível estimado: ${sc<60?'Não conforme':'Parcialmente conforme'}</span></div></div><ul class="mt-4 space-y-2">${pick.map(i=>`<li class="border border-slate-200 rounded-lg p-3"><span class="text-xs font-bold ${i[0]=='Crítica'?'text-red-700':'text-amber-700'}">${i[0].toUpperCase()}</span> <strong>${i[1]}</strong><br><span class="text-sm text-slate-600">Correção: ${i[2]}</span></li>`).join('')}</ul><p class="mt-3 text-sm"><strong>Plano:</strong> corrigir as falhas críticas em 2 semanas, validar com testadores ACESSA HUMAN e ativar o monitoramento EVOLVE.</p>`},700)}
+
+/* widget */
+const S={fs:0,hc:0,gray:0,invert:0,lf:0,dys:0,pause:0,guide:0,libras:0};
+const toggles=[['hc','Alto contraste escuro'],['gray','Escala de cinza'],['invert','Inverter cores'],['lf','Destaque de foco e bordas'],['dys','Fonte/Leitura para dislexia'],['guide','Guia de leitura (régua)'],['pause','Pausar animações']];
+function apply(){const r=document.documentElement;['fs1','fs2','fs3'].forEach(c=>r.classList.remove(c));if(S.fs)r.classList.add('fs'+S.fs);
+ ['hc','lf','dys','pause'].forEach(k=>r.classList.toggle(k,!!S[k]));
+ $('#app').style.filter=[S.gray?'grayscale(1)':'',S.invert?'invert(1) hue-rotate(180deg)':''].join(' ').trim();
+ $('#guide').style.display=S.guide?'block':'none';$('#libras').classList.toggle('hidden',!S.libras);
+ document.querySelectorAll('[data-t]').forEach(b=>b.setAttribute('aria-pressed',!!S[b.dataset.t]));
+ document.querySelectorAll('[data-t]').forEach(b=>b.classList.toggle('bg-blue-700',!!S[b.dataset.t]));
+ document.querySelectorAll('[data-t]').forEach(b=>b.classList.toggle('text-white',!!S[b.dataset.t]));
+ document.querySelectorAll('[data-f]').forEach(b=>b.classList.toggle('bg-blue-700',+b.dataset.f==S.fs));
+ document.querySelectorAll('[data-f]').forEach(b=>b.classList.toggle('text-white',+b.dataset.f==S.fs))}
+$('#fsb').innerHTML=['Normal','+15%','+30%','+45%'].map((t,i)=>`<button data-f="${i}" class="flex-1 border border-slate-300 rounded p-2">${t}</button>`).join('');
+$('#tg').innerHTML=toggles.slice(0,4).map(t=>`<button data-t="${t[0]}" class="border border-slate-300 rounded p-2 text-left">${t[1]}</button>`).join('')+'<h3 class="font-semibold mt-3">Neurodivergência, dislexia e TDAH</h3>'+toggles.slice(4).map(t=>`<button data-t="${t[0]}" class="border border-slate-300 rounded p-2 text-left">${t[1]}</button>`).join('');
+$('#tgl').innerHTML='<button data-t="libras" class="w-full border border-slate-300 rounded p-2 text-left">Intérprete virtual de Libras</button>';
+document.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{S.fs=+b.dataset.f;apply()});
+document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{S[b.dataset.t]=S[b.dataset.t]?0:1;apply()});
+$('#reset').onclick=()=>{Object.keys(S).forEach(k=>S[k]=0);speechSynthesis.cancel();apply()};
+$('#fab').onclick=()=>{$('#panel').classList.toggle('hidden')};$('#close').onclick=()=>{$('#panel').classList.add('hidden');$('#fab').focus()};
+document.onkeydown=e=>{if(e.key=='Escape')$('#panel').classList.add('hidden')};
+document.addEventListener('mousemove',e=>{if(S.guide)$('#guide').style.top=(e.clientY-21)+'px'});
+function speak(){if(!('speechSynthesis' in window)){alert('Leitura em voz alta não é suportada neste navegador.');return}
+ if(speechSynthesis.speaking){speechSynthesis.cancel();return}
+ const u=new SpeechSynthesisUtterance($('#main').innerText);u.lang='pt-BR';speechSynthesis.speak(u)}
+$('#tts').onclick=speak;
+function preset(p){Object.keys(S).forEach(k=>S[k]=0);speechSynthesis.cancel();
+ if(p=='low'){S.fs=2;S.hc=1;S.lf=1}if(p=='dys'){S.dys=1;S.lf=1}if(p=='adhd'){S.guide=1;S.pause=1}if(p=='deaf')S.libras=1;apply();if(p=='blind')speak()}
+go('inicio');apply();
+</script>
+</body>
+</html>
